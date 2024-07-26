@@ -1,22 +1,30 @@
-version: '3'
+version: '3.8'
 
 services:
     redis-master:
-        image: redis:3
+        image: redis:latest
         command: redis-server
+        ports:
+        - "6380:6379"
+        networks:
+        - redis-cluster
 
     redis-slave-1:
-        image: redis:3
+        image: redis:latest
         command: redis-server --slaveof redis-master 6379
         links:
             - redis-master
-
+        networks:
+        - redis-cluster
+        
     redis-slave-2:
-        image: redis:3
+        image: redis:latest
         command: redis-server --slaveof redis-master 6379
         links:
             - redis-master
-
+        networks:
+        - redis-cluster
+        
     sentinel-1:
         build: sentinel
         environment:
@@ -27,7 +35,9 @@ services:
             - redis-master
             - redis-slave-1
             - redis-slave-2
-
+        networks:
+        - redis-cluster
+        
     sentinel-2:
         build: sentinel
         environment:
@@ -38,7 +48,9 @@ services:
             - redis-master
             - redis-slave-1
             - redis-slave-2
-
+        networks:
+        - redis-cluster
+        
     sentinel-3:
         build: sentinel
         environment:
@@ -49,17 +61,24 @@ services:
             - redis-master
             - redis-slave-1
             - redis-slave-2
-
-    redis_cluster_app:
-        build: app
+        networks:
+        - redis-cluster
+        
+    phpredisadmin:
+        image: erikdubbelboer/phpredisadmin
+        container_name: phpredisadmin
+        ports:
+            - "8080:80"
+        networks:
+            - redis-cluster
         environment:
-          - SENTINEL_DOWN_AFTER=5000
-          - SENTINEL_FAILOVER=500
-          - SENTINEL_QUORUM=2
+            REDIS_1_HOST: redis-master
+            REDIS_1_PORT: 6379
         depends_on:
             - redis-master
             - redis-slave-1
             - redis-slave-2
-        command: /bin/bash -c "echo 'Waiting for redis to run..' && sleep 60 && python redis_app.py"
-        volumes:
-            - ./app:/usr/src/app/redis_app/
+
+networks:
+  redis-cluster:
+    driver: bridge
