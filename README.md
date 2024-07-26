@@ -4,12 +4,12 @@ This is an example project which implements redis master slave architecture in P
 
 ## Dependencies
 
-* [Python 3.7](https://www.python.org/downloads/release/python-370/)
+* [PHP]
 * [Redis](https://redis.io/)
 * [Redis Sentinel](https://redis.io/topics/sentinel)
 * [Docker](https://www.docker.com/)
 * [Docker Compose](https://docs.docker.com/compose/)
-* [Py-Redis](https://pypi.org/project/redis/)
+* [phpRedisAdmin](https://github.com/ErikDubbelboer/phpRedisAdmin)
 
 ## Architecture
 
